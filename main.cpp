@@ -22,13 +22,10 @@ int main(int argc, char** argv)
     std::stringstream ss;
     std::size_t i = 0;
 
-    for (auto && result: results)
+    for (auto && [line, pos, str]: results)
     {
-        for (auto && [pos, str]: result.values)
-        {
-            ++i;
-            ss << result.line+1 << ' ' << pos+1 << ' ' << str << std::endl;
-        }
+        ++i;
+        ss << line+1 << ' ' << pos+1 << ' ' << str << std::endl;
     }
 
     std::cout << i << std::endl

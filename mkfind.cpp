@@ -1,20 +1,31 @@
 #include "mkfind.h"
 
-#include <iostream>
+#include <cassert>
 #include <vector>
-#include <thread>
+#include <list>
 #include <optional>
-
-#include <boost/asio/thread_pool.hpp>
-#include <boost/asio/post.hpp>
+#include <future>
 
 namespace {
 
+struct Result
+{
+    std::size_t line;
+
+    struct Data {
+        std::size_t pos;
+        std::string str;
+    };
+
+    std::list<Data> values;
+};
+
 auto parse(std::string_view in, std::string_view mask)
 {
-    std::vector<std::tuple<unsigned, std::string_view>> r;
+    assert(!mask.empty());
 
-    if (mask.empty()) return r;
+    Result result;
+    auto& r = result.values;
 
     for (std::size_t i = 0, j = 0; i < in.size();)
     {
@@ -26,83 +37,87 @@ auto parse(std::string_view in, std::string_view mask)
                 auto pos = i - (mask.size() - 1);
                 auto b = in.begin() + pos;
                 auto e = b + mask.size();
-                r.emplace_back(pos, std::string_view {b,e});
+                r.emplace_back(pos, std::string{b,e});
                 break;
             }
         }
     }
 
-    return r;
+    return result;
 }
 
-constexpr auto partice = 10ULL; // Будем считывать по partice строчек, парсить и записывать результат.
-
-auto read_part_strings(std::ifstream &file)
+auto divide_string(std::string_view in, std::string_view mask, std::size_t chars_count)
 {
-    std::vector<std::string> lines(partice);
-    std::string line;
+    assert(!mask.empty());
+    assert(chars_count != 0);
 
-    for (size_t i = 0; (i+1) % partice; ++i)
+    const auto div = in.size() / chars_count;
+    const auto rem = in.size() % chars_count;
+
+    std::vector<std::string_view> result(div + (mask.size() < rem));
+
+    auto b = in.begin();
+    for (std::size_t i = 0; i < result.size() - (rem != 0); ++i)
     {
-        if (std::getline(file, line)) {
-            lines[i % partice] = std::move(line);
-        } else {
-            lines.resize(i);
-            return lines;
-        }
+        result[i] = { b, b + chars_count + mask.size() };
+        b += chars_count;
     }
 
-    return lines;
+    if (rem != 0) {
+        result[result.size() - 1] = { b, in.end() };
+    }
+
+    return result;
 }
 
 }
 
-std::list<Result> mkfind(std::ifstream& file, std::string_view mask)
+std::list<Match> mkfind(std::ifstream& file, std::string_view mask)
 {
     const auto hc = std::thread::hardware_concurrency();
-    boost::asio::thread_pool pool(hc == 0 ? 1 : hc);
 
-    std::list<Result> results;
+    std::list<Match> results;
+    std::string line;
 
-    for (std::size_t partice_number = 0;; ++partice_number)
+    for (auto line_index = 0U; std::getline(file, line); ++line_index)
     {
-        const auto lines = read_part_strings(file);
-        if (lines.empty()) break;
+        assert(1 < mask.size());
+        const std::size_t chars_count = line.size() / (mask.size() - 1);
 
-        std::vector<std::optional<Result>> part_results(lines.size());
+        const auto parts = divide_string(line, mask, chars_count);
+        std::vector<std::future<std::optional<Result>>> part_results(parts.size());
 
-        for (auto j = 0U; j < part_results.size(); ++j)
+        for (auto j = 0U; j < parts.size(); ++j)
         {
-            boost::asio::post(pool, [j, partice_number, mask, &part_results, &lines]{
-                auto parsed = parse(lines[j], mask);
+            part_results[j] = std::async(std::launch::async, [=, &parts]
+            {
+                auto parsed = parse(parts[j], mask);
 
-                if (parsed.empty())
-                    return;
-
-                part_results[j] = Result{};
-
-                auto& v = part_results[j]->values;
-                v.resize(parsed.size());
-
-                for (size_t k = 0; k < parsed.size(); ++k) {
-                    auto [pos, str] = parsed[k];
-                    part_results[j]->line = j + partice_number * partice;
-                    v[k].pos = pos;
-                    v[k].str = str;
+                if (parsed.values.empty()) {
+                    return std::optional<Result>{};
                 }
+
+                for (auto& v: parsed.values) {
+                    v.pos += j * chars_count;
+                }
+
+                parsed.line = line_index;
+                return std::optional{parsed};
+
             });
         }
 
-        pool.wait();
-
-        for (auto && result : part_results)
+        for (auto && result: part_results)
         {
-            if (result.has_value()) {
-                results.push_back(std::move(result.value()));
+            auto opt = result.get();
+            if (opt.has_value()) {
+                for (auto && [pos, str]: opt->values)
+                {
+                    results.emplace_back(opt->line, pos, std::move(str));
+                }
             }
         }
     }
 
-    pool.join();
     return results;
 }

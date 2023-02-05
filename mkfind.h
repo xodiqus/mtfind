@@ -5,20 +5,17 @@
 #include <string>
 #include <fstream>
 #include <list>
-#include <vector>
 
-struct Result
+struct Match
 {
     std::size_t line;
-
-    struct Data {
-        std::size_t pos;
-        std::string str;
-    };
-
-    std::vector<Data> values;
+    std::size_t pos;
+    std::string str;
 };
 
-std::list<Result> mkfind(std::ifstream&, std::string_view mask);
+/*
+ * Finds substrings in 'file' with 'mask'.
+ */
+std::list<Match> mkfind(std::ifstream& file, std::string_view mask);
 
 #endif // MKFIND_H
