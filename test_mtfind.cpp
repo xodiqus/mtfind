@@ -94,6 +94,38 @@ BOOST_AUTO_TEST_CASE(parse_test)
         BOOST_TEST(it->str == "ade");
     }
 
+    result = detail::parse("abcd", "??");
+
+    BOOST_TEST(result.values.size() == 2);
+
+    it = result.values.begin();
+    if (1 <= result.values.size()) {
+        BOOST_TEST(it->pos == 0);
+        BOOST_TEST(it->str == "ab");
+    }
+
+    ++it;
+    if (2 <= result.values.size()) {
+        BOOST_TEST(it->pos == 2);
+        BOOST_TEST(it->str == "cd");
+    }
+
+    result = detail::parse("ab", "?");
+
+    BOOST_TEST(result.values.size() == 2);
+
+    it = result.values.begin();
+    if (1 <= result.values.size()) {
+        BOOST_TEST(it->pos == 0);
+        BOOST_TEST(it->str == "a");
+    }
+
+    ++it;
+    if (2 <= result.values.size()) {
+        BOOST_TEST(it->pos == 1);
+        BOOST_TEST(it->str == "b");
+    }
+
     result = detail::parse("Eventually it is last test!", "?s?");
 
     BOOST_TEST(result.values.size() == 3);
