@@ -1,7 +1,8 @@
 #include <iostream>
 #include <sstream>
+#include <fstream>
 
-#include "mkfind.h"
+#include "mtfind.h"
 
 int main(int argc, char** argv)
 {
@@ -18,7 +19,7 @@ int main(int argc, char** argv)
         std::cerr << "Can't open: " << argv[1] << "!" << std::endl;
     }
 
-    const auto results = mkfind(file, mask);
+    const auto results = mkfind([&](std::string* line) { return !!std::getline(file, *line); }, mask);
     std::stringstream ss;
     std::size_t i = 0;
 
