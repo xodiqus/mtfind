@@ -17,6 +17,7 @@ int main(int argc, char** argv)
 
     if (!file.is_open()) {
         std::cerr << "Can't open: " << argv[1] << "!" << std::endl;
+        return EXIT_FAILURE;
     }
 
     const auto results = mkfind([&](std::string* line) { return !!std::getline(file, *line); }, mask);
