@@ -55,19 +55,28 @@ std::tuple<std::vector<std::string_view>, std::size_t> divide_string(std::string
     assert(0 < top_limit);
     assert(mask_length - 1 < in.size());
 
-    const auto chars_count = (in.size() - mask_length + 1) / top_limit;
+    const auto chars_count = in.size() / top_limit;
 
     if (chars_count == 0)
         return divide_string(in, mask_length, top_limit - 1);
 
     std::vector<std::string_view> result(top_limit);
 
-    for (std::size_t i = 0; i < result.size(); ++i)
+    std::size_t i = 0;
+    for (; i < result.size(); ++i)
     {
         using namespace std::views;
-        auto items = in | drop(i*chars_count) | take(chars_count + mask_length - 1);
-        result[i] = { items.begin(), items.end() };
+
+        auto temp = in | drop(i*chars_count) | take(chars_count + mask_length - 1);
+        auto item = std::string_view{ temp.begin(), temp.end() };
+
+        if (item.size() < mask_length)
+            break;
+
+        result[i] = item;
     }
+
+    result.resize(i);
 
     return { std::move(result), chars_count };
 }

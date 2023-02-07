@@ -226,6 +226,20 @@ BOOST_AUTO_TEST_CASE(divide_string_test)
     if (5 <= result.size()) {
         BOOST_TEST(*it == "exx");
     }
+
+    std::tie(result, chars_count) = detail::divide_string("XXXX'XXXX'XXXX'XXX123abcd", 3, hc);
+
+    BOOST_TEST(chars_count == 3);
+    BOOST_TEST(result.size() == 8);
+
+    if (7 <= result.size())
+    {
+        auto it = result.rbegin();
+        BOOST_TEST(*it == "abcd");
+
+        ++it;
+        BOOST_TEST(*it == "123ab");
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
