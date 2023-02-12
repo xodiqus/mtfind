@@ -14,7 +14,7 @@ using namespace mtfind;
 
 namespace {
 
-auto StringReader(std::stringstream& in)
+auto stringReader(std::stringstream& in)
 {
     return [&](std::string* line)
     {
@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(test1)
        << "But I've come through." << std::endl;
 
 
-    auto result = mtfind::mtfind(StringReader(in), "?ad");
+    auto result = mtfind::mtfind(stringReader(in), "?ad");
 
     BOOST_TEST(result.size() == 3);
 
@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(test1)
     }
 }
 
-BOOST_AUTO_TEST_CASE(parse_test)
+BOOST_AUTO_TEST_CASE(find_bf_test)
 {
     auto result = find_bf("I had made", "?ad");
 
@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_CASE(parse_test)
     }
 }
 
-BOOST_AUTO_TEST_CASE(divide_string_test)
+BOOST_AUTO_TEST_CASE(split_test)
 {
     constexpr auto hc = 8;
     auto [result, chars_count] = split("aaaabbbbccccddddXX", 3, hc);
@@ -248,7 +248,7 @@ BOOST_AUTO_TEST_CASE(divide_string_test)
 
 }
 
-BOOST_AUTO_TEST_CASE(divide_string_no_zero_devision)
+BOOST_AUTO_TEST_CASE(split_no_zero_devision)
 {
     auto [result, chars_count] = split("x", 1, 3);
 
