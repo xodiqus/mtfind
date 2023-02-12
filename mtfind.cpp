@@ -9,7 +9,7 @@
 
 namespace mtfind {
 
-Result parse(std::string_view in, std::string_view mask)
+Result find_bf(std::string_view in, std::string_view mask)
 {
     assert(!mask.empty());
 
@@ -48,7 +48,7 @@ Result parse(std::string_view in, std::string_view mask)
     return result;
 }
 
-std::tuple<std::vector<std::string_view>, std::size_t> divide_string(std::string_view in, std::size_t mask_length, std::size_t top_limit)
+std::tuple<std::vector<std::string_view>, std::size_t> split(std::string_view in, std::size_t mask_length, std::size_t top_limit)
 {
     assert(!in.empty());
     assert(0 < mask_length);
@@ -66,7 +66,7 @@ std::tuple<std::vector<std::string_view>, std::size_t> divide_string(std::string
     const auto chars_count = in.size() / top_limit;
 
     if (chars_count == 0)
-        return divide_string(in, mask_length, top_limit - 1);
+        return split(in, mask_length, top_limit - 1);
 
     std::vector<std::string_view> result(top_limit);
 
@@ -89,7 +89,7 @@ std::tuple<std::vector<std::string_view>, std::size_t> divide_string(std::string
     return { std::move(result), chars_count };
 }
 
-std::deque<Match> mkfind(std::function<bool(std::string*)> stringReader, std::string_view mask)
+std::deque<Match> mtfind(std::function<bool(std::string*)> stringReader, std::string_view mask, Finder find)
 {
     assert(0 < mask.size());
 
@@ -99,14 +99,14 @@ std::deque<Match> mkfind(std::function<bool(std::string*)> stringReader, std::st
 
     for (auto line_index = 0U; stringReader(&line); ++line_index)
     {
-        const auto [parts, chars_count] = divide_string(line, mask.size(), hc == 0 ? 1 : hc);
+        const auto [parts, chars_count] = split(line, mask.size(), hc == 0 ? 1 : hc);
         std::vector<std::future<std::optional<Result>>> part_results(parts.size());
 
         for (auto j = 0U; j < parts.size(); ++j)
         {
             part_results[j] = std::async(std::launch::async, [=, &parts]
             {
-                auto parsed = parse(parts[j], mask);
+                auto parsed = find(parts[j], mask);
 
                 if (parsed.values.empty()) {
                     return std::optional<Result>{};

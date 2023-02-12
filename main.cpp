@@ -19,7 +19,7 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    const auto results = mtfind::mkfind([&](std::string* line) { return !!std::getline(file, *line); }, mask);
+    const auto results = mtfind::mtfind([&](std::string* line) { return !!std::getline(file, *line); }, mask);
 
     std::cout << results.size() << std::endl;
 

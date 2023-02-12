@@ -27,14 +27,15 @@ struct Match
     std::string str;
 };
 
-Result parse(std::string_view in, std::string_view mask);
+Result find_bf(std::string_view in, std::string_view mask);
 
-std::tuple<std::vector<std::string_view>, std::size_t> divide_string(std::string_view in, std::size_t mask_length, std::size_t top_limit);
+using Finder = std::function<Result(std::string_view, std::string_view)>;
+using StringReader = std::function<bool(std::string*)>;
 
 /*
  * Finds substrings using 'stringReader' with 'mask'.
  */
-std::deque<Match> mkfind(std::function<bool(std::string*)> stringReader, std::string_view mask);
+std::deque<Match> mtfind(StringReader stringReader, std::string_view mask, Finder = find_bf);
 
 }
 
