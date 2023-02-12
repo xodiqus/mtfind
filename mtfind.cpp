@@ -2,10 +2,10 @@
 
 #include <cassert>
 #include <vector>
-#include <list>
 #include <optional>
 #include <future>
 #include <ranges>
+#include <deque>
 
 namespace detail {
 
@@ -83,13 +83,13 @@ std::tuple<std::vector<std::string_view>, std::size_t> divide_string(std::string
 
 }
 
-std::list<Match> mkfind(std::function<bool(std::string*)> stringReader, std::string_view mask)
+std::deque<Match> mkfind(std::function<bool(std::string*)> stringReader, std::string_view mask)
 {
     assert(0 < mask.size());
     using namespace detail;
 
     const auto hc = std::thread::hardware_concurrency();
-    std::list<Match> results;
+    std::deque<Match> results;
     std::string line;
 
     for (auto line_index = 0U; stringReader(&line); ++line_index)

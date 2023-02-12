@@ -3,7 +3,7 @@
 
 #include <string_view>
 #include <string>
-#include <list>
+#include <deque>
 #include <functional>
 
 namespace detail {
@@ -17,7 +17,7 @@ struct Result
         std::string str;
     };
 
-    std::list<Data> values;
+    std::deque<Data> values;
 };
 
 }
@@ -32,6 +32,6 @@ struct Match
 /*
  * Finds substrings using 'stringReader' with 'mask'.
  */
-std::list<Match> mkfind(std::function<bool(std::string*)> stringReader, std::string_view mask);
+std::deque<Match> mkfind(std::function<bool(std::string*)> stringReader, std::string_view mask);
 
 #endif // MKFIND_H
