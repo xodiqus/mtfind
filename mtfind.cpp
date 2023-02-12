@@ -55,6 +55,14 @@ std::tuple<std::vector<std::string_view>, std::size_t> divide_string(std::string
     assert(0 < top_limit);
     assert(mask_length - 1 < in.size());
 
+    // There is no devision by zero:
+    // 1) A user can't put top_limit = 0 because of the assert above.
+    // 2) The recursion below can't come the zero devision:
+    //		For all top_limit != 0 and all in.size() != 0, the recurent calls have any top_limit != 0.
+    // 		Example:
+    // 				divide_string("x", _, 3); // chars_count = 1 / 3 = 0;
+    //				divide_string("x", _, 2); // chars_count = 1 / 2 = 0;
+    // 				divide_string("x", _, 1); // chars_count = 1 / 1 = 1; The recursion finish.
     const auto chars_count = in.size() / top_limit;
 
     if (chars_count == 0)

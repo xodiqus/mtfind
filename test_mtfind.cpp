@@ -240,6 +240,15 @@ BOOST_AUTO_TEST_CASE(divide_string_test)
         ++it;
         BOOST_TEST(*it == "123ab");
     }
+
+}
+
+BOOST_AUTO_TEST_CASE(divide_string_no_zero_devision)
+{
+    auto [result, chars_count] = detail::divide_string("x", 1, 3);
+
+    BOOST_TEST(result.size() == 1);
+    BOOST_TEST(result.front() == "x");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
