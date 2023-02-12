@@ -7,7 +7,7 @@
 #include <ranges>
 #include <deque>
 
-namespace detail {
+namespace mtfind {
 
 Result parse(std::string_view in, std::string_view mask)
 {
@@ -89,12 +89,9 @@ std::tuple<std::vector<std::string_view>, std::size_t> divide_string(std::string
     return { std::move(result), chars_count };
 }
 
-}
-
 std::deque<Match> mkfind(std::function<bool(std::string*)> stringReader, std::string_view mask)
 {
     assert(0 < mask.size());
-    using namespace detail;
 
     const auto hc = std::thread::hardware_concurrency();
     std::deque<Match> results;
@@ -138,3 +135,6 @@ std::deque<Match> mkfind(std::function<bool(std::string*)> stringReader, std::st
 
     return results;
 }
+
+}
+

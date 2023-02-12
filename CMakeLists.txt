@@ -23,7 +23,7 @@ install(TARGETS mtfind
 find_package(Boost COMPONENTS unit_test_framework)
 
 if (${BOOST_FOUND})
-        add_executable(mtfind_test test_mtfind.cpp test_mtfind.h)
+        add_executable(mtfind_test test_mtfind.cpp)
         target_compile_features(mtfind_test PRIVATE cxx_std_20)
         target_link_libraries(mtfind_test PRIVATE mtfind_lib)
         target_include_directories(mtfind_test PRIVATE ${BOOST_INCLUDE_DIR})

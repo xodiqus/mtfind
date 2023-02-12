@@ -4,8 +4,9 @@
 #include <sstream>
 #include <tuple>
 
-#include "test_mtfind.h"
 #include "mtfind.h"
+
+using namespace mtfind;
 
 namespace {
 
@@ -62,7 +63,7 @@ BOOST_AUTO_TEST_CASE(test1)
 
 BOOST_AUTO_TEST_CASE(parse_test)
 {
-    auto result = detail::parse("I had made", "?ad");
+    auto result = parse("I had made", "?ad");
 
     BOOST_TEST(result.values.size() == 2);
 
@@ -78,7 +79,7 @@ BOOST_AUTO_TEST_CASE(parse_test)
         BOOST_TEST(it->str == "mad");
     }
 
-    result = detail::parse("You also had made", "ad?");
+    result = parse("You also had made", "ad?");
 
     BOOST_TEST(result.values.size() == 2);
 
@@ -94,7 +95,7 @@ BOOST_AUTO_TEST_CASE(parse_test)
         BOOST_TEST(it->str == "ade");
     }
 
-    result = detail::parse("abcd", "??");
+    result = parse("abcd", "??");
 
     BOOST_TEST(result.values.size() == 2);
 
@@ -110,7 +111,7 @@ BOOST_AUTO_TEST_CASE(parse_test)
         BOOST_TEST(it->str == "cd");
     }
 
-    result = detail::parse("ab", "?");
+    result = parse("ab", "?");
 
     BOOST_TEST(result.values.size() == 2);
 
@@ -126,7 +127,7 @@ BOOST_AUTO_TEST_CASE(parse_test)
         BOOST_TEST(it->str == "b");
     }
 
-    result = detail::parse("Eventually it is last test!", "?s?");
+    result = parse("Eventually it is last test!", "?s?");
 
     BOOST_TEST(result.values.size() == 3);
 
@@ -152,7 +153,7 @@ BOOST_AUTO_TEST_CASE(parse_test)
 BOOST_AUTO_TEST_CASE(divide_string_test)
 {
     constexpr auto hc = 8;
-    auto [result, chars_count] = detail::divide_string("aaaabbbbccccddddXX", 3, hc);
+    auto [result, chars_count] = divide_string("aaaabbbbccccddddXX", 3, hc);
 
     BOOST_TEST(chars_count == 2);
     BOOST_TEST(result.size() == 8);
@@ -197,7 +198,7 @@ BOOST_AUTO_TEST_CASE(divide_string_test)
         BOOST_TEST(*it == "ddXX");
     }
 
-    std::tie(result, chars_count) = detail::divide_string("abcdexx", 3, hc);
+    std::tie(result, chars_count) = divide_string("abcdexx", 3, hc);
 
     BOOST_TEST(chars_count == 1);
     BOOST_TEST(result.size() == 5);
@@ -227,7 +228,7 @@ BOOST_AUTO_TEST_CASE(divide_string_test)
         BOOST_TEST(*it == "exx");
     }
 
-    std::tie(result, chars_count) = detail::divide_string("XXXX'XXXX'XXXX'XXX123abcd", 3, hc);
+    std::tie(result, chars_count) = divide_string("XXXX'XXXX'XXXX'XXX123abcd", 3, hc);
 
     BOOST_TEST(chars_count == 3);
     BOOST_TEST(result.size() == 8);
@@ -245,7 +246,7 @@ BOOST_AUTO_TEST_CASE(divide_string_test)
 
 BOOST_AUTO_TEST_CASE(divide_string_no_zero_devision)
 {
-    auto [result, chars_count] = detail::divide_string("x", 1, 3);
+    auto [result, chars_count] = divide_string("x", 1, 3);
 
     BOOST_TEST(result.size() == 1);
     BOOST_TEST(result.front() == "x");
