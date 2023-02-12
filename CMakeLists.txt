@@ -7,6 +7,10 @@ file(COPY "input.txt" DESTINATION "${CMAKE_BINARY_DIR}/")
 add_library(mtfind_lib mtfind.cpp mtfind.h)
 add_executable(mtfind main.cpp input.txt)
 
+find_package(Threads REQUIRED)
+
+target_link_libraries(mtfind_lib PUBLIC Threads::Threads)
+
 foreach (proj mtfind mtfind_lib)
         target_compile_features(${proj} PRIVATE cxx_std_20)
 endforeach()
