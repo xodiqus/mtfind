@@ -14,7 +14,7 @@ Result parse(std::string_view in, std::string_view mask)
     assert(!mask.empty());
 
     Result result;
-    auto& r = result.values;
+    auto& values = result.values;
 
     // Compares from the first char for mask.size().
     constexpr auto eq = [](std::string_view in, std::string_view mask)
@@ -37,9 +37,9 @@ Result parse(std::string_view in, std::string_view mask)
     {
         if (eq({in.begin() + i, in.end()}, mask))
         {
-            auto b = in.begin() + i;
-            auto e = b + mask.size();
-            r.emplace_back(i, std::string{b,e});
+            auto begin = in.begin() + i;
+            auto end   = begin + mask.size();
+            values.emplace_back(i, std::string{begin,end});
 
             i += mask.size() - 1;
         }
@@ -107,8 +107,8 @@ std::deque<Match> mkfind(std::function<bool(std::string*)> stringReader, std::st
                     return std::optional<Result>{};
                 }
 
-                for (auto& v: parsed.values) {
-                    v.pos += j * chars_count;
+                for (auto& value: parsed.values) {
+                    value.pos += j * chars_count;
                 }
 
                 parsed.line = line_index;
@@ -118,11 +118,11 @@ std::deque<Match> mkfind(std::function<bool(std::string*)> stringReader, std::st
 
         for (auto && result: part_results)
         {
-            auto opt = result.get();
-            if (opt.has_value()) {
-                for (auto && [pos, str]: opt->values)
+            auto optional = result.get();
+            if (optional.has_value()) {
+                for (auto && [pos, str]: optional->values)
                 {
-                    results.emplace_back(opt->line, pos, std::move(str));
+                    results.emplace_back(optional->line, pos, std::move(str));
                 }
             }
         }
